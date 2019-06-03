@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        https://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 允许注解形式声明bean -->
+	<context:component-scan base-package="controller" />
+	
+	<!-- 允许SpringMVC的注解映射 -->
+    <!-- 开启mvc注解 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <!-- 设置返回字符串编码 -->
+            <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name = "supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+            <!-- json转换器 -->
+            <!-- 启动JSON格式的配置 解决 HttpMediaTypeNotAcceptableException: Could not find acceptable representation(406) -->
+            <bean id="mappingJackson2HttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+	
+	<!-- 允许访问WEB-INF外的资源 -->
+	<mvc:default-servlet-handler/>
+	
+	<!-- 配置视图解析器，决定跳转到哪个页面 -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+	    <property name="prefix" value="/WEB-INF/views/"/>
+	    <property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- 异常处理 -->
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<!-- 在异常页面通过${ex}取出异常信息,默认为${exception} -->
+		<property name="exceptionAttribute" value="ex"></property>
+	</bean>
+	<!-- 上传解析器 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"></property>
+		<property name="maxUploadSize" value="-1" />
+		<property name="MaxInMemorySize" value="4096"/>  
+		<property name="uploadTempDir" value="uploadFiles"></property>
+	</bean>
+</beans>
